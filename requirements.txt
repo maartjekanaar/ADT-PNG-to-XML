@@ -1,0 +1,4 @@
+ADTCreate
+numpy
+opencv-python
+pytesseract
