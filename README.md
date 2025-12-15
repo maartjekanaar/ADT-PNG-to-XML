@@ -1,4 +1,4 @@
-# Bachelor Thesis Project
+# ADT PNG to XML
 
 This repository contains the Python program for Maartje Kanaar's Bachelor Thesis Project for the Leiden Institute of Advanced Sciences (LIACS).
 
