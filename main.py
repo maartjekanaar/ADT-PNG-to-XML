@@ -268,7 +268,7 @@ def extract_refinement_edges(
             length = math.hypot(delta_x, delta_y)
 
             # Skip short segments (likely not refinement edges)
-            if length < 80:
+            if length < 40:
                 continue
 
             # Skip (almost) horizontal segments (conjunctive refinement arcs)
@@ -343,7 +343,7 @@ def extract_countermeasure_edges(
         rho=1,
         theta=np.pi / 180,
         threshold=40,
-        minLineLength=40,
+        minLineLength=4,
         maxLineGap=100,
     )
 
