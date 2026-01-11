@@ -268,7 +268,7 @@ def merge_overlapping_lines_by_orientation(
     image: np.ndarray, lines: list[Line]
 ) -> list[RotatedRectangle]:
     """
-    Merge overlapping given <lines> into rotated rectangles by drawing all lines in the given <image> and finding contours around them.
+    Merge overlapping given <lines> into rotated rectangles by drawing all lines in the given <image> and finding contours around them based on their orientation.
     Return a list of the rotated rectangles representing the merged lines.
     """
     lines_by_orientation: dict[int, list[Line]] = {}
@@ -317,7 +317,7 @@ def extract_connectors(
     image: np.ndarray, masked_image: np.ndarray
 ) -> list[RotatedRectangle]:
     """
-    Extract all connectors (refinement edges, countermeasure edges, conjunctive refinement arcs) from the given <masked_image> binary image. Let merge_overlapping_lines() transform them into rotated rectangles on the given <image>.
+    Extract all connectors (refinement edges, countermeasure edges, conjunctive refinement arcs) from the given <masked_image> binary image using HoughLinesP(). Let merge_overlapping_lines() transform them into rotated rectangles on the given <image>.
     Return a list of the rotated rectangles for all connectors.
     """
     raw_connectors: list[Line] = []
@@ -380,7 +380,7 @@ def extract_edges_and_arcs(
     connectors: list[RotatedRectangle],
 ) -> tuple[list[RotatedRectangle], list[RotatedRectangle], list[RotatedRectangle]]:
     """
-    Separate the <connectors> into refinement edges, countermeasure edges, and conjunctive refinement arcs using the given <nodes> and <threshold> image.
+    Separate the <connectors> into refinement edges, countermeasure edges, and conjunctive refinement arcs by checking if a connector connects two different <nodes> in the <threshold> image.
     Return a tuple of the rotated rectangles for the refinement edges, countermeasure edges, and conjunctive refinement arcs.
     """
     edges: list[RotatedRectangle] = []
