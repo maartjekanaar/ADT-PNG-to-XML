@@ -1,0 +1,35 @@
+# ADT Create
+Welcome to **ADT Create**. This project aims to provide a general method to create and customize Attack-Defense Trees (ADTs), allowing users to visualize and analyse security scenarios. A user is able to *create and customize ADTs from scratch*, *upload/download ADTs in XML format*, *generate ADTerms based on ADTs*, *compare ADTerms to determine equivalence using an equivalence threshold using the Levenshtein Distance*, *determine satisfiability of an ADT* and *generate statistics of an ADT*.
+
+## Getting Started
+This document will guide you through the project structure and the installation process of **ADT Create**.
+
+Explore the unlimited possible ADTs and strenghten your defenses!
+
+### Project Structure
+The files of the **package** can be found in folder `ADTCreate/`. \
+This folder contains the following files:
+- `ADT.py`: general functionalities for creation and construction of ADTs, contains the calls to other modules. 
+- `ADTXML.py`: XML import and export functionalities.
+- `ADTSatisfiability.py`: Satisfiability functionalities.
+- `GenerateADTerm.py`: ADTerm Generation functionalities.
+- `CompareADTerms.py`: ADTerms Comparison functionalities.
+- `MultisetList.py`: Multiset implementation based on the `List` type.
+
+The **testprogram** can be found in this project in file `main.py` \
+The **changelog** can be found in this project in file `changelog.md`. \
+The **manual** can be found in this project in file `code_documentation.md`.
+
+### Installation
+Make sure you have installed **Python version >= 3.7** and the `pip` package. \
+Open your Terminal (on UNIX systems), and run `pip install ADTCreate`. \
+Open up a Python file, and add `from ADTCreate import ADT`. 
+
+You have now succesfully installed **ADT Create** and imported it into your project. \
+Happy coding! 
+
+To create an ADT, use: `adt_instance = ADT.initADT(type, refinement, label)`. \
+Use the features of **ADT Create** by performing them on `adt_instance`, such as `adt_instance.addChild(...)`.
+
+See `code_documentation.md` for instructions on how to use **ADT Create**, and `changelog.md` for the changelog on the GitHub repository of this project.
+

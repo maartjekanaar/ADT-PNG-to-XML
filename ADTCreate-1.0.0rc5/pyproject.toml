@@ -1,0 +1,22 @@
+[project]
+name = "ADTCreate"
+version = "1.0.0rc5"
+authors = [
+  { name="Jayme Hebinck", email="jayme.hebinck@live.nl" },
+]
+description = "ADT Create provides a general method to create and customize Attack-Defense Trees (ADTs), allowing users to visualize and analyse security scenarios. A user is able to create and customize ADTs from scratch, upload/download ADTs in XML format, generate ADTerms based on ADTs, compare ADTerms to determine equivalence using an equivalence threshold using the Levenshtein Distance, determine satisfiability of an ADT and generate statistics of an ADT"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "Levenshtein>=0.23.0",
+    "numpy>=1.21.6",
+]
+
+[project.urls]
+Homepage = "https://github.com/MainJay/ADTPythonLibrary/"
+Issues = "https://github.com/MainJay/ADTPythonLibrary/issues"
