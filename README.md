@@ -105,6 +105,10 @@ python main.py ./path/to/ADT-images/ ./path/to/folder-for-XML/
 
 The script will process the input PNG image(s) and generate XML file(s) in the specified output directory. If the output directory does not exist, it will be created automatically.
 
+### Note for Fast Conversion
+
+For fast conversion, **comment out all lines directly after `For analysis:` in the code**. These lines trigger the display of intermediate results as images and are only needed for debugging, experiments or analysis. Commenting them out will prevent pop-up windows and speed up the conversion process.
+
 ## Troubleshooting
 
 - **Tesseract-OCR not found:** Ensure Tesseract is installed and added to your system PATH. On Windows, you may need to specify the Tesseract executable path in your script or environment variables.
