@@ -12,10 +12,18 @@ from type_aliases_and_data_structures import (
     NodeDict,
 )
 
+from parameters import (
+    ROI_THRESHOLD,
+)
+
 from helper_functions import (
     get_line_endpoints,
     point_near_or_in_rectangle,
     is_same_node,
+)
+
+from analysis_functions import (
+    show,
 )
 
 
@@ -41,7 +49,10 @@ def create_node_objects_with_text(
         roi = image[y1:y2, x1:x2]
 
         roi_grey = cv.cvtColor(roi, cv.COLOR_BGR2GRAY)
-        _, roi_threshold = cv.threshold(roi_grey, 200, 255, cv.THRESH_BINARY)
+        _, roi_threshold = cv.threshold(roi_grey, ROI_THRESHOLD, 255, cv.THRESH_BINARY)
+
+        # For analysis:
+        show(roi_threshold, "ROI threshold for OCR")
 
         raw_text: str = pytesseract.image_to_string(
             roi_threshold, lang="eng", config="--psm 6"

@@ -1,8 +1,8 @@
 # Developed by Maartje Kanaar as part of the Bachelor Thesis Project for the Leiden Institute of Advanced Sciences (LIACS).
 # Helper functions for geometric computations and image processing.
 
-import numpy as np
 import cv2 as cv
+import numpy as np
 
 from type_aliases_and_data_structures import (
     Point,
@@ -12,9 +12,14 @@ from type_aliases_and_data_structures import (
     NodeDict,
 )
 
+from parameters import (
+    ERODE_PIXELS,
+    POINT_NEAR_RECTANGLE_THRESHOLD,
+)
+
 
 def interior_ink_density(
-    threshold: np.ndarray, contour: np.ndarray, erode_pixels: int = 4
+    threshold: np.ndarray, contour: np.ndarray, erode_pixels: int = ERODE_PIXELS
 ) -> float:
     """
     Calculate the interior ink density of the given <contour> in the <threshold> binary image. Erode the contour by <erode_pixels> to exclude the borders.
@@ -84,7 +89,9 @@ def get_line_endpoints(rectangle: RotatedRectangle) -> tuple[Point, Point]:
 
 
 def point_near_or_in_rectangle(
-    point: tuple[float, float], rectangle_points: RectanglePoints, threshold: int = 15
+    point: tuple[float, float],
+    rectangle_points: RectanglePoints,
+    threshold: int = POINT_NEAR_RECTANGLE_THRESHOLD,
 ) -> bool:
     """
     Check if the given <point> is near or inside the rotated rectangle with the given <rectangle_points>.

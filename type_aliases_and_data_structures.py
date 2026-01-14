@@ -1,9 +1,9 @@
 # Developed by Maartje Kanaar as part of the Bachelor Thesis Project for the Leiden Institute of Advanced Sciences (LIACS).
 # Type aliases and data structures for geometric entities and node representation.
 
-import numpy as np
-import cv2 as cv
 from typing import Literal, TypedDict
+import cv2 as cv
+import numpy as np
 
 Point = tuple[int, int]  # (x, y)
 Line = tuple[Point, Point]  # (point1, point2)

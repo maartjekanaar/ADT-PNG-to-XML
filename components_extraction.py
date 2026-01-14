@@ -14,6 +14,22 @@ from type_aliases_and_data_structures import (
 
 from parameters import (
     RECTANGLE_EXPANSION_FACTOR,
+    IOU_THRESHOLD,
+    NODES_KERNEL_SIZE,
+    NODES_MIN_CONTOUR_AREA,
+    NODES_MIN_WIDTH,
+    NODES_MIN_HEIGHT,
+    NODES_MIN_RECTANGLE_AREA,
+    NODES_MAX_RECTANGLE_AREA,
+    NODES_MIN_INK_DENSITY,
+    CONNECTORS_ORIENTATION_BIN_SIZE,
+    CONNECTORS_MERGE_THRESHOLD,
+    CONNECTORS_KERNEL_SIZE,
+    CONNECTORS_BLUR_KERNEL_SIZE,
+    CONNECTORS_THRESHOLD,
+    CONNECTORS_MIN_LINE_LENGTH,
+    CONNECTORS_MAX_LINE_GAP,
+    EDGES_CONTOUR_THRESHOLD,
 )
 
 from helper_functions import (
@@ -66,7 +82,7 @@ def remove_container_rectangles(
 
 
 def merge_overlapping_rectangles(
-    rectangles: list[RotatedRectangle], iou_threshold: float = 0.3
+    rectangles: list[RotatedRectangle], iou_threshold: float = IOU_THRESHOLD
 ) -> list[RotatedRectangle]:
     """
     Merge overlapping rotated rectangles from the given <rectangles> based on the Intersection over Union (IoU), using the specified <iou_threshold>.
@@ -122,31 +138,34 @@ def extract_nodes(threshold: np.ndarray) -> list[RotatedRectangle]:
     """
     raw_nodes: list[RotatedRectangle] = []
 
-    kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (2, 2))
-    eroded = cv.dilate(threshold, kernel, iterations=1)
-    contours, _ = cv.findContours(eroded, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, NODES_KERNEL_SIZE)
+    dilated = cv.dilate(threshold, kernel, iterations=1)
+    contours, _ = cv.findContours(dilated, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
     for contour in contours:
         area = cv.contourArea(contour)
 
         # Skip very small contours (noise, small text)
-        if area < 200:
+        if area < NODES_MIN_CONTOUR_AREA:
             continue
 
         x_left, y_top, width, height = cv.boundingRect(contour)
 
         # Skip narrow contours (likely not nodes)
-        if width < 40 or height < 20:
+        if width < NODES_MIN_WIDTH or height < NODES_MIN_HEIGHT:
             continue
 
         # Skip small (other shapes) or large (merged groups) rectangles
         rectangle_area = width * height
-        if rectangle_area < 2000 or rectangle_area > 100000:
+        if (
+            rectangle_area < NODES_MIN_RECTANGLE_AREA
+            or rectangle_area > NODES_MAX_RECTANGLE_AREA
+        ):
             continue
 
         # Skip contours with low interior ink density (likely not nodes)
         ink_density = interior_ink_density(threshold, contour)
-        if ink_density < 0.01:
+        if ink_density < NODES_MIN_INK_DENSITY:
             continue
 
         center = (x_left + width / 2, y_top + height / 2)
@@ -162,7 +181,7 @@ def extract_nodes(threshold: np.ndarray) -> list[RotatedRectangle]:
         node_image = draw_rotated_rectangles(
             analysis_functions.test_image, node_rectangles
         )
-        show(node_image, "All nodes")
+        show(node_image, "Nodes")
 
     return node_rectangles
 
@@ -183,7 +202,7 @@ def merge_overlapping_lines_by_orientation(
             angle -= 180
         while angle <= -90:
             angle += 180
-        normalised_orientation = int(round(angle / 15))
+        normalised_orientation = int(round(angle / CONNECTORS_ORIENTATION_BIN_SIZE))
         lines_by_orientation.setdefault(normalised_orientation, []).append(
             (point1, point2)
         )
@@ -194,7 +213,9 @@ def merge_overlapping_lines_by_orientation(
 
         lines_image = draw_lines(image, lines)
         grey = cv.cvtColor(lines_image, cv.COLOR_BGR2GRAY)
-        _, threshold = cv.threshold(grey, 250, 255, cv.THRESH_BINARY_INV)
+        _, threshold = cv.threshold(
+            grey, CONNECTORS_MERGE_THRESHOLD, 255, cv.THRESH_BINARY_INV
+        )
         contours, _ = cv.findContours(
             threshold, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE
         )
@@ -225,17 +246,17 @@ def extract_connectors(
     """
     raw_connectors: list[Line] = []
 
-    kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (2, 2))
-    enhanced = cv.dilate(masked_image, kernel, iterations=1)
+    kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, CONNECTORS_KERNEL_SIZE)
+    dilated = cv.dilate(masked_image, kernel, iterations=1)
+    solid_input = cv.medianBlur(dilated, CONNECTORS_BLUR_KERNEL_SIZE)
 
-    solid_input = cv.medianBlur(enhanced, 3)
     lines = cv.HoughLinesP(
         solid_input,
         rho=1,
         theta=np.pi / 180,
-        threshold=12,
-        minLineLength=10,
-        maxLineGap=40,
+        threshold=CONNECTORS_THRESHOLD,
+        minLineLength=CONNECTORS_MIN_LINE_LENGTH,
+        maxLineGap=CONNECTORS_MAX_LINE_GAP,
     )
 
     if lines is not None:
@@ -269,7 +290,7 @@ def separate_edges(
             region_crop, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE
         )
 
-        if len(contours) < 4:
+        if len(contours) < EDGES_CONTOUR_THRESHOLD:
             refinement_edges.append(edge)
         else:
             countermeasure_edges.append(edge)

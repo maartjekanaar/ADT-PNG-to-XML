@@ -3,8 +3,8 @@
 
 from typing import Optional
 import cv2 as cv
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 from type_aliases_and_data_structures import (
     RotatedRectangle,
@@ -62,4 +62,4 @@ def show_all_components(
         contour_image, conjunctive_refinement_arcs, color=(0, 255, 0)
     )  # green
 
-    show(contour_image, "All components")
+    show(contour_image, "Components")

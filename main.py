@@ -9,6 +9,7 @@ import sys
 
 from parameters import (
     RECTANGLE_EXPANSION_FACTOR,
+    IMAGE_PREPROCESS_THRESHOLD,
 )
 
 from components_extraction import (
@@ -25,6 +26,7 @@ from tree_structure import (
 
 import analysis_functions
 from analysis_functions import (
+    show,
     show_all_components,
 )
 
@@ -38,7 +40,9 @@ def process_image(image: np.ndarray) -> ADT | None:
     Return the root ADT object or None if no nodes are correctly detected or no root node could be determined.
     """
     grey = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    _, threshold = cv.threshold(grey, 200, 255, cv.THRESH_BINARY_INV)
+    _, threshold = cv.threshold(
+        grey, IMAGE_PREPROCESS_THRESHOLD, 255, cv.THRESH_BINARY_INV
+    )
 
     ### 1. Extract nodes: ###
     nodes = extract_nodes(threshold)
@@ -59,6 +63,9 @@ def process_image(image: np.ndarray) -> ADT | None:
 
     # Remove node areas from threshold image
     masked_image = cv.bitwise_and(threshold, cv.bitwise_not(node_mask))
+
+    # For analysis:
+    show(masked_image, "No nodes")
 
     connectors = extract_connectors(image, masked_image)
 
