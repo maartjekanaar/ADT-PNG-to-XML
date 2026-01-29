@@ -91,7 +91,6 @@ class _XML:
 
         return True
 
-
     def _importXML(self, fileName: str = "", manual: bool = True) -> Union['ADT.ADT', bool]:
         """
         Imports a new ADT with `self` as the root node `ADT` object. Filename can either be given as parameter or interactively via Terminal (to allow for dynamical file import) and should **not contain .xml**.
@@ -157,14 +156,6 @@ class _XML:
                     # If refinement is set to 'conjunctive', this node has the AND refinement, which is type 1.
                     refNode = 1
 
-                # Retrieve type
-                typeNodeStr = child.getAttribute("switchRole")
-                # If switchRole is present in the .xml, this node is of type 1 (defense node)
-                if (typeNodeStr == "yes"):
-                    typeNode = 1
-                else:
-                    typeNode = 0
-
                 # Determine parent
                 parentNode = 0  # The parent node, used in creating the ADT resulting from the import.
                 if depthLoop != 0:
@@ -183,12 +174,23 @@ class _XML:
                         # on this depth. The parent of this node is guaranteed also the parent of this node.
                         parentNode = depthParent[depths[depthLoop]]
 
+                # Retrieve type
+                typeNodeStr = child.getAttribute("switchRole")
+                # If root, type is 0 (attack node)
+                if parentNode is None or parentNode == 0:
+                    typeNode = 0
+                # If switchRole is present in the .xml, this node has the opposite type of the parent node.
+                else:
+                    if typeNodeStr == "yes":
+                        typeNode = 1 - parentNode.type
+                    else:
+                        typeNode = parentNode.type
+
                 # Using all gathered information, create ADT of this node.
                 ADTInstance = _createADTInstance(nodeID, typeNode, refNode, treeLabelStructure[nodeID], parentNode,
                                        [False, None])
                 ADTInstance.usedIDs.append(nodeID) # Fill usedIDs list to keep track of all used IDs.
                 treeNodeStructure[treeLoop] = ADTInstance
-
 
                 # Increment all needed variables for looping and identification.
                 nodeID = nodeID + 1
