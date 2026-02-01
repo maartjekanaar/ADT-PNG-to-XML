@@ -1,18 +1,19 @@
 # Developed by Maartje Kanaar as part of the Bachelor Thesis Project for the Leiden Institute of Advanced Sciences (LIACS).
 # Assessment file to compare XML files of Attack-Defence Trees.
 
-from typing import Optional
 from ADTCreate.ADT import ADT
+from typing import Optional
 import os
+import re
 import sys
 
 
 def handle_single_comparison(
     generated_xml_path: str, reference_xml_path: str
-) -> Optional[tuple[bool, int | None]]:
+) -> Optional[bool]:
     """
-    Compare a single ADT at the given <generated_xml_path> to the ADT at the <reference_xml_path>.
-    Return a tuple containing a boolean indicating equivalence and an integer representing the Levenshtein distance or None if not equivalent, or None if an error occurs.
+    Compare a single ADT at the given <generated_xml_path> to the ADT at the <reference_xml_path>. Normalise labels before comparison.
+    Return a boolean indicating equivalence or None if an error occurs.
     """
     print(f"\nProcessing: {generated_xml_path}")
     generated_adt = ADT(0, 0, 0, "", None, [(True, None)])
@@ -33,9 +34,20 @@ def handle_single_comparison(
     generated_adterm = generated_adt_root.generateADTerm()
     reference_adterm = reference_adt_root.generateADTerm()
 
-    comparison_result = generated_adt_root.compareADTerms(
-        generated_adterm, reference_adterm
-    )
+    def normalise_adterm_labels(adterm: str) -> str:
+        normalised = re.sub(r'"[^"]*"', '"node"', adterm)
+        return normalised
+
+    normalised_generated_adterm = normalise_adterm_labels(generated_adterm)
+    normalised_reference_adterm = normalise_adterm_labels(reference_adterm)
+
+    try:
+        comparison_result, _ = generated_adt_root.compareADTerms(
+            normalised_generated_adterm, normalised_reference_adterm
+        )
+    except Exception as e:
+        print(f"Error comparing ADTerms: {e}")
+        return None
 
     return comparison_result
 
@@ -52,11 +64,10 @@ def main(generated_path: str, reference_path: str) -> None:
         and reference_path.lower().endswith(".xml")
     ):
         comparison_result = handle_single_comparison(generated_path, reference_path)
-        if comparison_result:
-            equivalent, distance = comparison_result
-            print(
-                f"Single file comparison result: Equivalent: {equivalent}, Distance: {distance}"
-            )
+        if comparison_result is not None:
+            print(f"Single file comparison result: Equivalent: {comparison_result}")
+        else:
+            print("Error during comparison of the single files.")
 
     elif os.path.isdir(generated_path) and os.path.isdir(reference_path):
         results = []
@@ -68,9 +79,10 @@ def main(generated_path: str, reference_path: str) -> None:
                     comparison_result = handle_single_comparison(
                         generated_xml_path, reference_xml_path
                     )
-                    if comparison_result:
-                        equivalent, distance = comparison_result
-                        results.append(f"{filename}: {equivalent}, {distance}")
+                    if comparison_result is not None:
+                        results.append(f"{filename}: {comparison_result}")
+                    else:
+                        results.append(f"{filename}: Error during comparison.")
                 else:
                     print(f"No matching file for {filename} in {reference_path}.")
 
